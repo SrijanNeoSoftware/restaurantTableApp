@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
-class PlaceOrderScreen extends StatelessWidget {
-  PlaceOrderScreen({Key? key}) : super(key: key);
+class PlaceOrderScreen extends StatefulWidget {
+  const PlaceOrderScreen({Key? key}) : super(key: key);
+
+  @override
+  State<PlaceOrderScreen> createState() => _PlaceOrderScreenState();
+}
+
+class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   final TextEditingController _searchTextEditingController =
       TextEditingController();
+
   final List<int> text = List.generate(50, (index) => index);
+
+  final List selectedList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -50,12 +59,28 @@ class PlaceOrderScreen extends StatelessWidget {
             ),
             UIHelper.verticalSpaceSmall(context),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(text.length, (index) {
-                    return MenuItemCardBuilder(text: text);
-                  }),
+              child: GridView.builder(
+                addAutomaticKeepAlives: true,
+                cacheExtent: 100.0,
+                primary: false,
+                shrinkWrap: true,
+                itemCount: 20,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemBuilder: (BuildContext context, int index) => GridItem(
+                  index: index,
+                  isSelected: (bool value) {
+                    setState(() {
+                      if (value) {
+                        selectedList.add(index);
+                      } else {
+                        selectedList.remove(index);
+                      }
+                    });
+                    debugPrint("$index : $value");
+                    debugPrint(selectedList.toString());
+                  },
+                  key: Key(index.toString()),
                 ),
               ),
             ),
@@ -77,20 +102,68 @@ class PlaceOrderScreen extends StatelessWidget {
   }
 }
 
-class MenuItemCardBuilder extends StatelessWidget {
+class GridItem extends StatefulWidget {
   final int? index;
-  final List<int>? text;
+  final ValueChanged<bool>? isSelected;
 
-  const MenuItemCardBuilder({Key? key, this.index, this.text})
-      : super(key: key);
+  const GridItem({Key? key, this.index, this.isSelected}) : super(key: key);
+
+  @override
+  _GridItemState createState() => _GridItemState();
+}
+
+class _GridItemState extends State<GridItem>
+    with AutomaticKeepAliveClientMixin {
+  bool isSelected = false;
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
-      elevation: 2,
-      child: ListTile(
-        title: Text("data"),
+    return InkWell(
+      onTap: () {
+        setState(() {
+          isSelected = !isSelected;
+          widget.isSelected!(isSelected);
+        });
+      },
+      child: Stack(
+        children: <Widget>[
+          Card(
+            color: isSelected ? Colors.black12 : Colors.white,
+            elevation: 5,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Menu Item",
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  Text(
+                    "${widget.index! + 1}",
+                    style: Theme.of(context).textTheme.headline3,
+                  )
+                ],
+              ),
+            ),
+          ),
+          isSelected
+              ? const Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.check_circle,
+                      color: Colors.blue,
+                    ),
+                  ),
+                )
+              : Container()
+        ],
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
