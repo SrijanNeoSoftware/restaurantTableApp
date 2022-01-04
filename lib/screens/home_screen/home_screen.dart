@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
+import 'package:restaurant_table_app/models/get_tables_list_model.dart';
 import 'package:restaurant_table_app/screens/menu_screen/menu_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
@@ -7,6 +10,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    GetTableListBloc getTableListBloc;
+    getTableListBloc = BlocProvider.of<GetTableListBloc>(context);
     return Scaffold(
       appBar: AppBar(
         leading: const CircleAvatar(
@@ -21,59 +26,82 @@ class HomeScreen extends StatelessWidget {
           )
         ],
       ),
-      body: Container(
-        margin: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Select a table",
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              UIHelper.verticalSpaceSmall(context),
-              GridView.builder(
-                primary: false,
-                shrinkWrap: true,
-                itemCount: 20,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
-                itemBuilder: (BuildContext context, int index) =>
-                    GestureDetector(
-                  onTap: () {
-                    debugPrint("Table ${index + 1}");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MenuScreen(
-                          index: index,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    elevation: 5,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Table",
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          Text(
-                            "${index + 1}",
-                            style: Theme.of(context).textTheme.headline3,
-                          )
-                        ],
-                      ),
+      body: BlocBuilder<GetTableListBloc, GetTableListState>(
+        bloc: getTableListBloc,
+        builder: (context, state) {
+          if (state is GetTableListInitialState) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is GetTableListLoadingState) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is GetTableListLoadedState) {
+            return Container(
+              margin: const EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Select a table",
+                      style: Theme.of(context).textTheme.headline6,
                     ),
-                  ),
+                    UIHelper.verticalSpaceSmall(context),
+                    GridView.builder(
+                        primary: false,
+                        shrinkWrap: true,
+                        itemCount: state.tableList!.data!.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3),
+                        itemBuilder: (BuildContext context, int index) {
+                          List<GetTableListDatum> table =
+                              state.tableList!.data!;
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, 'menuScreen',
+                                  arguments: 1);
+                            },
+                            child: Card(
+                              elevation: 5,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      table[index].tableName!.split(" ").first,
+                                      style:
+                                          Theme.of(context).textTheme.subtitle1,
+                                    ),
+                                    Text(
+                                      table[index].tableName!.split(" ").last,
+                                      style:
+                                          Theme.of(context).textTheme.headline4,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+          }
+          if (state is GetTableListLoadingErrorState) {
+            return const Center(
+              child: Text("Could not load the list of tables"),
+            );
+          }
+          return const Center(
+            child: Text("Something went wrong"),
+          );
+        },
       ),
     );
   }

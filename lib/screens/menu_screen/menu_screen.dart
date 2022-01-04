@@ -3,7 +3,7 @@ import 'package:restaurant_table_app/screens/place_order_screen/place_order_scre
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class MenuScreen extends StatefulWidget {
-  final int? index;
+  final dynamic index;
   const MenuScreen({Key? key, @required this.index}) : super(key: key);
 
   @override
@@ -11,6 +11,7 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  List selectedItems = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,11 +23,10 @@ class _MenuScreenState extends State<MenuScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: const [],
-              ),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: selectedItems.length,
+              itemBuilder: (context, index) => Text("$index"),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -50,13 +50,14 @@ class _MenuScreenState extends State<MenuScreen> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: Colors.blue),
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      selectedItems = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const PlaceOrderScreen(),
                         ),
                       );
+                      setState(() {});
                     },
                     child: const Text("ADD"),
                   ),

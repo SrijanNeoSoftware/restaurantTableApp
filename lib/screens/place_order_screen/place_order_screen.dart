@@ -89,7 +89,9 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context, selectedList);
+                    },
                     child: const Text("SUBMIT"),
                   ),
                 )
@@ -115,6 +117,9 @@ class GridItem extends StatefulWidget {
 class _GridItemState extends State<GridItem>
     with AutomaticKeepAliveClientMixin {
   bool isSelected = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
@@ -162,8 +167,4 @@ class _GridItemState extends State<GridItem>
       ),
     );
   }
-
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
 }

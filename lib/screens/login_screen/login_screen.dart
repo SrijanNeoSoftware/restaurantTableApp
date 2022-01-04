@@ -49,12 +49,8 @@ class LoginScreen extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                               primary: Theme.of(context).primaryColor),
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              ),
-                            );
+                            Navigator.pushReplacementNamed(
+                                context, 'homeScreen');
                           },
                           child: const Text("LOGIN"),
                         ),
