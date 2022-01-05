@@ -14,7 +14,14 @@ class GetMenuItemsRepository extends BaseRepository {
 
       GetItemsListModel getItemList = GetItemsListModel.fromJson(response.data);
 
-      return getItemList;
+      var result = getItemList.data!
+          .where((element) => element.itemName!
+              .toLowerCase()
+              .trim()
+              .contains(searchItemName!.toLowerCase().trim()))
+          .toList();
+
+      return result;
     } on DioError catch (dioError) {
       debugPrint(dioError.toString());
       final String errorMessage = NetworkUtils.getDioErrormessage(dioError);
