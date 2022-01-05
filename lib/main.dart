@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_table_app/router.dart';
-import 'package:restaurant_table_app/screens/splash_screen/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());

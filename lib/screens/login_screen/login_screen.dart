@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_table_app/screens/home_screen/home_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class LoginScreen extends StatelessWidget {

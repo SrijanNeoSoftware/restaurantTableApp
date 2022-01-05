@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
 import 'package:restaurant_table_app/models/get_tables_list_model.dart';
-import 'package:restaurant_table_app/screens/menu_screen/menu_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,10 +12,14 @@ class HomeScreen extends StatelessWidget {
     GetTableListBloc getTableListBloc;
     getTableListBloc = BlocProvider.of<GetTableListBloc>(context);
     return Scaffold(
+      backgroundColor: const Color(0xFFe4eaf1),
       appBar: AppBar(
-        leading: const CircleAvatar(
-          radius: 5.0,
-          child: Icon(Icons.person),
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            // radius: 5.0,
+            child: Icon(Icons.person),
+          ),
         ),
         title: const Text("Srijan Maharjan"),
         actions: [
@@ -64,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                           return GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(context, 'menuScreen',
-                                  arguments: 1);
+                                  arguments: table[index].tableName!);
                             },
                             child: Card(
                               elevation: 5,

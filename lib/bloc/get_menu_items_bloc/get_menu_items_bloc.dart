@@ -18,10 +18,11 @@ class GetMenuItemsBloc extends Bloc<GetMenuItemsEvent, GetMenuItemsState> {
   }
 
   FutureOr<void> fetchItemsList(
-      GetMenuItemsEvent event, Emitter<GetMenuItemsState> emit) async {
+      FetchMenuItems event, Emitter<GetMenuItemsState> emit) async {
     try {
       emit(GetMenuItemsLoadingState());
-      GetItemsListModel itemsList = await getMenuItemsRepository!.getMenuItem();
+      GetItemsListModel itemsList = await getMenuItemsRepository!
+          .getMenuItem(searchItemName: event.searchItemName);
       emit(GetMenuItemsLoadedState(itemsList: itemsList));
     } catch (e) {
       emit(GetMenuItemsLoadingErrorState(errorMessage: e.toString()));

@@ -4,6 +4,7 @@ import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_blo
 import 'package:restaurant_table_app/repository/get_tables_repository.dart';
 import 'package:restaurant_table_app/screens/home_screen/home_screen.dart';
 import 'package:restaurant_table_app/screens/menu_screen/menu_screen.dart';
+import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
 import 'package:restaurant_table_app/screens/splash_screen/splash_screen.dart';
 
 class RouteGenerator {
@@ -31,8 +32,14 @@ class RouteGenerator {
       case "menuScreen":
         return MaterialPageRoute(
           builder: (_) => MenuScreen(
-            index: args,
+            tableName: args,
           ),
+        );
+
+      //Route for Splashscreen
+      case "placeOrderScreen":
+        return MaterialPageRoute(
+          builder: (_) => const PlaceOrderScreen(),
         );
 
       default:

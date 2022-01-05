@@ -8,5 +8,7 @@ abstract class GetMenuItemsEvent extends Equatable {
 }
 
 class FetchMenuItems extends GetMenuItemsEvent {
-  const FetchMenuItems();
+  final String? searchItemName;
+
+  FetchMenuItems({@required this.searchItemName});
 }

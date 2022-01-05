@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_table_app/utils/network_utils.dart';
 
 class GetMenuItemsRepository extends BaseRepository {
-  getMenuItem() async {
+  getMenuItem({@required String? searchItemName}) async {
     try {
       Response<dynamic> response = await dioGetRequest(
         url: getItemsUrl,

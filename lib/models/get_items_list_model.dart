@@ -1,7 +1,7 @@
 // To parse this JSON data, do
 //
 //     final getItemsListModel = getItemsListModelFromJson(jsonString);
-
+import 'package:flutter/material.dart';
 import 'dart:convert';
 
 GetItemsListModel getItemsListModelFromJson(String str) =>
@@ -37,23 +37,27 @@ class GetItemsListModel {
 }
 
 class ItemsListDatum {
-  ItemsListDatum({
-    this.itemCode,
-    this.itemName,
-    this.unitCode,
-    this.salesRate,
-  });
+  ItemsListDatum(
+      {@required this.itemCode,
+      @required this.itemName,
+      @required this.unitCode,
+      @required this.salesRate,
+      @required this.itemImage});
 
   int? itemCode;
   String? itemName;
   String? unitCode;
   int? salesRate;
+  String? itemImage;
 
   factory ItemsListDatum.fromJson(Map<String, dynamic> json) => ItemsListDatum(
         itemCode: json["ITEM_CODE"],
         itemName: json["ITEM_NAME"],
         unitCode: json["UNIT_CODE"],
         salesRate: json["SALES_RATE"],
+
+        //TODO dynamic item image
+        itemImage: json[""],
       );
 
   Map<String, dynamic> toJson() => {
