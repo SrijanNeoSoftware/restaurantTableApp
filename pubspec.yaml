@@ -39,7 +39,7 @@ dependencies:
   shared_preferences: ^2.0.8
   dio: ^4.0.3
   equatable: ^2.0.3
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -65,6 +65,12 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/1.jpg
+    - assets/serving.png
+    - assets/bg.jpg
+    - assets/tables.jpg
+    - assets/dining-table.png
+    - assets/take-away.png
+    
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

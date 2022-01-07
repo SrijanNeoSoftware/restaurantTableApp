@@ -12,7 +12,7 @@ class GetMenuItemsInitialState extends GetMenuItemsState {}
 class GetMenuItemsLoadingState extends GetMenuItemsState {}
 
 class GetMenuItemsLoadedState extends GetMenuItemsState {
-  final GetItemsListModel? itemsList;
+  final List<ItemsListDatum>? itemsList;
 
   const GetMenuItemsLoadedState({@required this.itemsList});
 

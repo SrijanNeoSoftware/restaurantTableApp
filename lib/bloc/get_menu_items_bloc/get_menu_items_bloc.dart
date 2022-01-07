@@ -21,7 +21,7 @@ class GetMenuItemsBloc extends Bloc<GetMenuItemsEvent, GetMenuItemsState> {
       FetchMenuItems event, Emitter<GetMenuItemsState> emit) async {
     try {
       emit(GetMenuItemsLoadingState());
-      GetItemsListModel itemsList = await getMenuItemsRepository!
+      List<ItemsListDatum> itemsList = await getMenuItemsRepository!
           .getMenuItem(searchItemName: event.searchItemName);
       emit(GetMenuItemsLoadedState(itemsList: itemsList));
     } catch (e) {

@@ -40,6 +40,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
             TextField(
               controller: _searchTextEditingController,
               decoration: InputDecoration(
+                hintText: "Item Name",
                 prefixIcon: const Icon(Icons.search),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 border: OutlineInputBorder(
@@ -92,44 +93,34 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     cacheExtent: 100.0,
                     primary: false,
                     shrinkWrap: true,
-                    itemCount: state.itemsList!.data!.length,
+                    itemCount: state.itemsList!.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2),
                     itemBuilder: (BuildContext context, int index) => GridItem(
                       index: index,
-                      items: state.itemsList!.data!,
+                      items: state.itemsList!,
                       isSelected: (bool value, String remarks) {
                         setState(() {
                           if (value) {
                             selectedList!.add(
                               SelectedItemsListDatum(
-                                itemCode:
-                                    state.itemsList!.data![index].itemCode,
-                                itemName:
-                                    state.itemsList!.data![index].itemName,
-                                unitCode:
-                                    state.itemsList!.data![index].unitCode,
-                                salesRate:
-                                    state.itemsList!.data![index].salesRate,
-                                itemImage:
-                                    state.itemsList!.data![index].itemImage,
+                                itemCode: state.itemsList![index].itemCode,
+                                itemName: state.itemsList![index].itemName,
+                                unitCode: state.itemsList![index].unitCode,
+                                salesRate: state.itemsList![index].salesRate,
+                                itemImage: state.itemsList![index].itemImage,
                                 remarks: remarks,
                               ),
                             );
                           } else {
                             selectedList!.remove(
                               SelectedItemsListDatum(
-                                itemCode:
-                                    state.itemsList!.data![index].itemCode,
-                                itemName:
-                                    state.itemsList!.data![index].itemName,
-                                unitCode:
-                                    state.itemsList!.data![index].unitCode,
-                                salesRate:
-                                    state.itemsList!.data![index].salesRate,
-                                itemImage:
-                                    state.itemsList!.data![index].itemImage,
+                                itemCode: state.itemsList![index].itemCode,
+                                itemName: state.itemsList![index].itemName,
+                                unitCode: state.itemsList![index].unitCode,
+                                salesRate: state.itemsList![index].salesRate,
+                                itemImage: state.itemsList![index].itemImage,
                                 remarks: remarks,
                               ),
                             );
@@ -142,7 +133,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                   );
                 }
                 if (state is GetMenuItemsLoadingErrorState) {
-                  print(state.errorMessage);
                   return const Center(
                     child: Text("Could not load the list of menu items"),
                   );
@@ -216,7 +206,7 @@ class _GridItemState extends State<GridItem>
                               controller: remarksEditingController,
                               maxLines: 5,
                               decoration: InputDecoration(
-                                hintText: "Enter item name",
+                                hintText: "Enter item remarks",
                                 contentPadding:
                                     const EdgeInsets.symmetric(horizontal: 8),
                                 border: OutlineInputBorder(
@@ -245,6 +235,8 @@ class _GridItemState extends State<GridItem>
                                       remarks = remarksEditingController.text;
                                       Navigator.of(context, rootNavigator: true)
                                           .pop();
+                                      FocusScope.of(context).unfocus();
+
                                       widget.isSelected!(isSelected, remarks);
                                     },
                                     child: const Text("Add Remarks"),
@@ -292,7 +284,17 @@ class _GridItemState extends State<GridItem>
                       bottom: 0,
                       right: 0,
                       child: Container(
-                        color: Colors.black45,
+                        // color: Colors.black45,
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                          begin: Alignment.bottomRight,
+                          end: Alignment.topRight,
+                          colors: [
+                            Colors.black87,
+                            Colors.black54,
+                            Colors.black45
+                          ],
+                        )),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
