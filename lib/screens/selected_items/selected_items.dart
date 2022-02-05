@@ -56,7 +56,8 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                 displayList = displayList! + selectedItems!;
 
                 for (var items in selectedItems!) {
-                  totalAmount = totalAmount! + items.salesRate!;
+                  totalAmount = totalAmount! +
+                      (items.salesRate! * int.tryParse(items.qty!)!);
                 }
 
                 setState(() {});
@@ -71,111 +72,116 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
           : Container(),
       body: Container(
         margin: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: displayList!.length,
-                itemBuilder: (context, index) {
-                  if (displayList!.isEmpty) {
-                    return const Center(
-                      child: Text("Please add an item"),
-                    );
-                  } else {
-                    return Card(
-                        child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: displayList!.isEmpty
+            ? Center(
+                child: Text("Please add an item"),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: displayList!.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                            child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                displayList![index].itemName!,
-                                style: Theme.of(context).textTheme.headline6,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    displayList![index].itemName!,
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                  ),
+                                  Text(
+                                    "Rs. ${displayList![index].salesRate! * int.tryParse(displayList![index].qty!)!}",
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                  ),
+                                ],
                               ),
-                              Text(
-                                "Rs. ${displayList![index].salesRate!}",
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
+                              Text("Quantity: " + displayList![index].qty!),
+                              Text("Remarks: " + displayList![index].remarks!),
                             ],
                           ),
-                          Text(displayList![index].remarks!),
-                        ],
-                      ),
-                    ));
-                  }
-                },
-              ),
-            ),
-            totalAmount != 0.0
-                ? Row(
-                    children: [
-                      Text(
-                        "Rs. $totalAmount",
-                        style: Theme.of(context).textTheme.headline3,
-                      ),
-                    ],
-                  )
-                : Container(),
-            displayList!.isEmpty
-                ? Container()
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          style:
-                              ElevatedButton.styleFrom(primary: Colors.green),
-                          onPressed: () {},
-                          child: const Text("SAVE"),
-                        ),
-                      ),
-                      UIHelper.horizontalSpaceSmall(context),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(primary: Colors.red),
-                          onPressed: () {},
-                          child: const Text("DELIVERED"),
-                        ),
-                      ),
-                      UIHelper.horizontalSpaceSmall(context),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(primary: Colors.blue),
-                          onPressed: () async {
-                            selectedItems = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BlocProvider(
-                                  create: (context) => GetMenuItemsBloc(
-                                      getMenuItemsRepository:
-                                          GetMenuItemsRepository())
-                                    ..add(FetchMenuItems(searchItemName: "")),
-                                  child: const PlaceOrderScreen(),
+                        ));
+                      },
+                    ),
+                  ),
+                  totalAmount != 0.0
+                      ? Row(
+                          children: [
+                            Text(
+                              "Rs. $totalAmount",
+                              style: Theme.of(context).textTheme.headline3,
+                            ),
+                          ],
+                        )
+                      : Container(),
+                  UIHelper.verticalSpaceSmall(context),
+                  displayList!.isEmpty
+                      ? Container()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            UIHelper.horizontalSpaceSmall(context),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.green),
+                                onPressed: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.all(24.0),
+                                  child: const Text("PAY BILL"),
                                 ),
                               ),
-                            );
+                            ),
+                            UIHelper.horizontalSpaceSmall(context),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.blue),
+                                onPressed: () async {
+                                  selectedItems = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider(
+                                        create: (context) => GetMenuItemsBloc(
+                                            getMenuItemsRepository:
+                                                GetMenuItemsRepository())
+                                          ..add(FetchMenuItems(
+                                              searchItemName: "")),
+                                        child: const PlaceOrderScreen(),
+                                      ),
+                                    ),
+                                  );
 
-                            displayList = displayList! + selectedItems!;
+                                  displayList = displayList! + selectedItems!;
 
-                            for (var items in selectedItems!) {
-                              totalAmount = totalAmount! + items.salesRate!;
-                            }
+                                  for (var items in selectedItems!) {
+                                    totalAmount =
+                                        totalAmount! + items.salesRate!;
+                                  }
 
-                            setState(() {});
-                            selectedItems!.clear();
-                          },
-                          child: const Text("ADD"),
+                                  setState(() {});
+                                  selectedItems!.clear();
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(24.0),
+                                  child: const Text("ADD ITEM"),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-          ],
-        ),
+                ],
+              ),
       ),
     );
   }

@@ -30,6 +30,8 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
+        centerTitle: true,
         title: const Text("Select Order"),
       ),
       body: Container(
@@ -100,7 +102,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     itemBuilder: (BuildContext context, int index) => GridItem(
                       index: index,
                       items: state.itemsList!,
-                      isSelected: (bool value, String remarks) {
+                      isSelected: (bool value, String remarks, String qty) {
                         setState(() {
                           if (value) {
                             selectedList!.add(
@@ -111,6 +113,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 salesRate: state.itemsList![index].salesRate,
                                 itemImage: state.itemsList![index].itemImage,
                                 remarks: remarks,
+                                qty: qty,
                               ),
                             );
                           } else {
@@ -122,6 +125,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 salesRate: state.itemsList![index].salesRate,
                                 itemImage: state.itemsList![index].itemImage,
                                 remarks: remarks,
+                                qty: qty,
                               ),
                             );
                           }
@@ -149,8 +153,14 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      debugPrint(selectedList![0].remarks);
-                      Navigator.pop(context, selectedList);
+                      if (selectedList!.isEmpty) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                AddOneItemDialogBuilder());
+                      } else {
+                        Navigator.pop(context, selectedList);
+                      }
                     },
                     child: const Text("SUBMIT"),
                   ),
@@ -167,7 +177,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
 class GridItem extends StatefulWidget {
   final List<ItemsListDatum>? items;
   final int? index;
-  final Function(bool value, String remarks)? isSelected;
+  final Function(bool value, String remarks, String qty)? isSelected;
 
   const GridItem({Key? key, this.isSelected, this.index, this.items})
       : super(key: key);
@@ -181,6 +191,15 @@ class _GridItemState extends State<GridItem>
   bool isSelected = false;
   String remarks = "";
   TextEditingController remarksEditingController = TextEditingController();
+  TextEditingController qtyEditingController = TextEditingController(text: '1');
+
+  @override
+  void dispose() {
+    remarksEditingController.dispose();
+    qtyEditingController.dispose();
+    super.dispose();
+  }
+
   @override
   bool get wantKeepAlive => true;
 
@@ -201,32 +220,25 @@ class _GridItemState extends State<GridItem>
                       padding: const EdgeInsets.all(8.0),
                       child: SingleChildScrollView(
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            //remarks
+                            Text("Enter item remarks"),
+                            UIHelper.verticalSpace(5),
                             TextField(
                               controller: remarksEditingController,
                               maxLines: 5,
-                              decoration: InputDecoration(
-                                hintText: "Enter item remarks",
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              ),
+                              decoration: inputDecoration(context),
                             ),
-                            UIHelper.verticalSpaceMedium(context),
+                            UIHelper.verticalSpaceSmall(context),
+                            //quantity
+                            Text("Enter item quantity"),
+                            UIHelper.verticalSpace(5),
+                            TextField(
+                              controller: qtyEditingController,
+                              decoration: inputDecoration(context),
+                            ),
+                            UIHelper.verticalSpaceSmall(context),
                             Row(
                               children: [
                                 Expanded(
@@ -237,21 +249,19 @@ class _GridItemState extends State<GridItem>
                                           .pop();
                                       FocusScope.of(context).unfocus();
 
-                                      widget.isSelected!(isSelected, remarks);
+                                      widget.isSelected!(
+                                        isSelected,
+                                        remarks,
+                                        qtyEditingController.text,
+                                      );
                                     },
-                                    child: const Text("Add Remarks"),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: const Text("Add Remarks"),
+                                    ),
                                   ),
                                 ),
                                 UIHelper.horizontalSpaceSmall(context),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context, rootNavigator: true)
-                                          .pop();
-                                    },
-                                    child: const Text("Cancel"),
-                                  ),
-                                ),
                               ],
                             ),
                           ],
@@ -335,6 +345,45 @@ class _GridItemState extends State<GridItem>
               : Container()
         ],
       ),
+    );
+  }
+
+  InputDecoration inputDecoration(BuildContext context) {
+    return InputDecoration(
+      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      border: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+    );
+  }
+}
+
+class AddOneItemDialogBuilder extends StatelessWidget {
+  const AddOneItemDialogBuilder({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Add at least one item."),
+      actions: [
+        TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop();
+            },
+            child: Text("OK"))
+      ],
     );
   }
 }
