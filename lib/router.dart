@@ -34,7 +34,7 @@ class RouteGenerator {
       case "selectedItemsScreen":
         return MaterialPageRoute(
           builder: (_) => SelectedItemsScreen(
-            tableName: args,
+            tableDetails: args,
           ),
         );
 

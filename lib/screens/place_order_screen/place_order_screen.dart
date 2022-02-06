@@ -7,8 +7,10 @@ import 'package:restaurant_table_app/models/selected_items_list_model.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class PlaceOrderScreen extends StatefulWidget {
-  final dynamic tableName;
-  const PlaceOrderScreen({Key? key, this.tableName}) : super(key: key);
+  // final SelectedItemsListDatum tableDetails;
+  final dynamic tableDetails;
+
+  const PlaceOrderScreen({Key? key, this.tableDetails}) : super(key: key);
 
   @override
   State<PlaceOrderScreen> createState() => _PlaceOrderScreenState();
@@ -34,7 +36,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       appBar: AppBar(
         leading: Container(),
         centerTitle: true,
-        title: const Text("Select Order"),
+        title: Text("Select Order for ${widget.tableDetails.table}"),
       ),
       body: Container(
         margin: const EdgeInsets.all(20),
@@ -109,14 +111,14 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                           if (value) {
                             selectedList!.add(
                               SelectedItemsListDatum(
-                                itemCode: state.itemsList![index].itemCode,
-                                itemName: state.itemsList![index].itemName,
-                                unitCode: state.itemsList![index].unitCode,
-                                salesRate: state.itemsList![index].salesRate,
-                                itemImage: state.itemsList![index].itemImage,
-                                remarks: remarks,
-                                qty: qty,
-                              ),
+                                  itemCode: state.itemsList![index].itemCode,
+                                  itemName: state.itemsList![index].itemName,
+                                  unitCode: state.itemsList![index].unitCode,
+                                  salesRate: state.itemsList![index].salesRate,
+                                  itemImage: state.itemsList![index].itemImage,
+                                  remarks: remarks,
+                                  qty: qty,
+                                  tableCode: widget.tableDetails.tableCode),
                             );
                           } else {
                             selectedList!.remove(
@@ -128,6 +130,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 itemImage: state.itemsList![index].itemImage,
                                 remarks: remarks,
                                 qty: qty,
+                                tableCode: widget.tableDetails.tableCode,
                               ),
                             );
                           }
@@ -162,13 +165,11 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 AddOneItemDialogBuilder());
                       } else {
                         List<SelectedItemsListDatum> newList =
-                            box.get(widget.tableName);
+                            box.get(widget.tableDetails.table) ?? [];
                         //add items for the current table
                         newList = newList + selectedList!;
 
-                        // print("${newList[0].itemName}, ${newList[1].itemName}");
-
-                        box.put(widget.tableName, newList);
+                        box.put(widget.tableDetails.table, newList);
                         Navigator.pop(context);
                       }
                     },

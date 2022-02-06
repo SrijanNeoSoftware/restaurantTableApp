@@ -5,3 +5,5 @@ const baseUrl = "http://182.93.95.196:7051/api/";
 const getTablesUrl = "${baseUrl}ContactMaster/GetTables";
 
 const getItemsUrl = "${baseUrl}ContactMaster/GetItems";
+
+const postSalesOrder = "${baseUrl}ContactMaster/GetSalesOrder";

@@ -7,9 +7,8 @@ late Box box;
 Future<void> main() async {
   await Hive.initFlutter();
   runApp(const MyApp());
-
-  box = await Hive.openBox('orderedItems');
   Hive.registerAdapter(SelectedItemsListDatumAdapter());
+  box = await Hive.openBox('orderedItems');
 }
 
 class MyApp extends StatelessWidget {

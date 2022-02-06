@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
+import 'package:restaurant_table_app/main.dart';
 import 'package:restaurant_table_app/models/get_tables_list_model.dart';
+import 'package:restaurant_table_app/models/selected_items_list_model.dart';
 import 'package:restaurant_table_app/screens/login_screen/login_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     GetTableListBloc getTableListBloc;
@@ -68,37 +75,61 @@ class HomeScreen extends StatelessWidget {
                                       (BuildContext context, int index) {
                                     List<GetTableListDatum> table =
                                         state.tableList!.data!;
+                                    List<SelectedItemsListDatum>
+                                        tableOrderData =
+                                        box.get(table[index].tableName!) ?? [];
+
                                     return GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                              context, 'selectedItemsScreen',
-                                              arguments:
-                                                  table[index].tableName!);
-                                        },
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Image.asset(
-                                              table[index]
-                                                      .tableName!
-                                                      .toLowerCase()
-                                                      .contains("away")
-                                                  ? 'assets/take-away.png'
-                                                  : 'assets/dining-table.png',
-                                              height: 60,
-                                              width: 60,
-                                            ),
-                                            Text(
-                                              table[index].tableName!,
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            )
-                                          ],
-                                        ));
+                                      onTap: () async {
+                                        await Navigator.pushNamed(
+                                          context,
+                                          'selectedItemsScreen',
+                                          arguments: SelectedItemsListDatum(
+                                            table: table[index].tableName!,
+                                            tableCode: table[index].tableCode!,
+                                          ),
+                                        );
+                                        setState(() {});
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.asset(
+                                            table[index]
+                                                    .tableName!
+                                                    .toLowerCase()
+                                                    .contains("away")
+                                                ? 'assets/take-away.png'
+                                                : 'assets/dining-table.png',
+                                            height: 60,
+                                            width: 60,
+                                          ),
+                                          Text(
+                                            table[index].tableName!,
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          UIHelper.verticalSpace(2),
+                                          tableOrderData.isEmpty
+                                              ? Container()
+                                              : Container(
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  color: Colors.red,
+                                                  child: Text(
+                                                    'OCCUPIED',
+                                                    style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.white),
+                                                  ),
+                                                )
+                                        ],
+                                      ),
+                                    );
                                   }),
                             ],
                           ),
@@ -132,6 +163,7 @@ class HomeScreen extends StatelessWidget {
               right: 0,
               child: IconButton(
                 onPressed: () {
+                  box.clear();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

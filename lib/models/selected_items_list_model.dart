@@ -12,6 +12,7 @@ class SelectedItemsListDatum {
     this.remarks,
     this.qty,
     this.table,
+    this.tableCode,
   });
 
   @HiveField(0)
@@ -30,4 +31,6 @@ class SelectedItemsListDatum {
   String? qty;
   @HiveField(7)
   String? table;
+  @HiveField(8)
+  String? tableCode;
 }

@@ -26,13 +26,14 @@ class SelectedItemsListDatumAdapter
       remarks: fields[5] as String?,
       qty: fields[6] as String?,
       table: fields[7] as String?,
+      tableCode: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SelectedItemsListDatum obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.itemCode)
       ..writeByte(1)
@@ -48,7 +49,9 @@ class SelectedItemsListDatumAdapter
       ..writeByte(6)
       ..write(obj.qty)
       ..writeByte(7)
-      ..write(obj.table);
+      ..write(obj.table)
+      ..writeByte(8)
+      ..write(obj.tableCode);
   }
 
   @override
