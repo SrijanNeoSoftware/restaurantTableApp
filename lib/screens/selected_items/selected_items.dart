@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_menu_items_bloc/get_menu_items_bloc.dart';
+import 'package:restaurant_table_app/main.dart';
 import 'package:restaurant_table_app/models/selected_items_list_model.dart';
 import 'package:restaurant_table_app/repository/get_menu_items_repository.dart';
 import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
@@ -16,21 +17,35 @@ class SelectedItemsScreen extends StatefulWidget {
 }
 
 class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
-  List<SelectedItemsListDatum>? selectedItems = [];
-  List<SelectedItemsListDatum>? displayList = [];
+  List<SelectedItemsListDatum> previousList = [];
+  List<SelectedItemsListDatum> displayList = [];
   double? totalAmount = 0.0;
+  @override
+  void initState() {
+    previousList = box.get(widget.tableName) ?? [];
+
+    for (var items in previousList) {
+      totalAmount =
+          totalAmount! + (items.salesRate! * int.tryParse(items.qty!)!);
+    }
+
+    displayList = displayList + previousList;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Order for ${widget.tableName}"),
         actions: [
-          displayList!.isNotEmpty
+          displayList.isNotEmpty
               ? IconButton(
                   onPressed: () {
                     setState(() {
                       totalAmount = 0.0;
-                      displayList!.clear();
+                      previousList.clear();
+                      displayList.clear();
                     });
                   },
                   icon: const Icon(Icons.clear),
@@ -38,30 +53,33 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
               : Container(),
         ],
       ),
-      floatingActionButton: displayList!.isEmpty
+      floatingActionButton: displayList.isEmpty
           ? FloatingActionButton(
               onPressed: () async {
-                selectedItems = await Navigator.push(
+                var data = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => BlocProvider(
                       create: (context) => GetMenuItemsBloc(
                           getMenuItemsRepository: GetMenuItemsRepository())
                         ..add(FetchMenuItems(searchItemName: "")),
-                      child: const PlaceOrderScreen(),
+                      child: PlaceOrderScreen(
+                        tableName: widget.tableName,
+                      ),
                     ),
                   ),
                 );
+                previousList = box.get(widget.tableName) ?? [];
 
-                displayList = displayList! + selectedItems!;
-
-                for (var items in selectedItems!) {
+                for (var items in previousList) {
                   totalAmount = totalAmount! +
                       (items.salesRate! * int.tryParse(items.qty!)!);
                 }
 
-                setState(() {});
-                selectedItems!.clear();
+                displayList = displayList + previousList;
+                setState(() {
+                  print("Data: $data");
+                });
               },
               child: Image.asset(
                 'assets/serving.png',
@@ -72,7 +90,7 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
           : Container(),
       body: Container(
         margin: const EdgeInsets.all(20),
-        child: displayList!.isEmpty
+        child: displayList.isEmpty
             ? Center(
                 child: Text("Please add an item"),
               )
@@ -82,7 +100,7 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: displayList!.length,
+                      itemCount: displayList.length,
                       itemBuilder: (context, index) {
                         return Card(
                             child: Padding(
@@ -95,19 +113,19 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    displayList![index].itemName!,
+                                    displayList[index].itemName!,
                                     style:
                                         Theme.of(context).textTheme.headline6,
                                   ),
                                   Text(
-                                    "Rs. ${displayList![index].salesRate! * int.tryParse(displayList![index].qty!)!}",
+                                    "Rs. ${displayList[index].salesRate! * int.tryParse(displayList[index].qty!)!}",
                                     style:
                                         Theme.of(context).textTheme.headline6,
                                   ),
                                 ],
                               ),
-                              Text("Quantity: " + displayList![index].qty!),
-                              Text("Remarks: " + displayList![index].remarks!),
+                              Text("Quantity: " + displayList[index].qty!),
+                              Text("Remarks: " + displayList[index].remarks!),
                             ],
                           ),
                         ));
@@ -125,7 +143,7 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                         )
                       : Container(),
                   UIHelper.verticalSpaceSmall(context),
-                  displayList!.isEmpty
+                  displayList.isEmpty
                       ? Container()
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -135,7 +153,11 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     primary: Colors.green),
-                                onPressed: () {},
+                                onPressed: () {
+                                  setState(() {
+                                    box.delete(widget.tableName);
+                                  });
+                                },
                                 child: Padding(
                                   padding: const EdgeInsets.all(24.0),
                                   child: const Text("PAY BILL"),
@@ -148,7 +170,7 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                                 style: ElevatedButton.styleFrom(
                                     primary: Colors.blue),
                                 onPressed: () async {
-                                  selectedItems = await Navigator.push(
+                                  var data = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => BlocProvider(
@@ -157,20 +179,29 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                                                 GetMenuItemsRepository())
                                           ..add(FetchMenuItems(
                                               searchItemName: "")),
-                                        child: const PlaceOrderScreen(),
+                                        child: PlaceOrderScreen(
+                                          tableName: widget.tableName,
+                                        ),
                                       ),
                                     ),
                                   );
+                                  previousList =
+                                      box.get(widget.tableName) ?? [];
 
-                                  displayList = displayList! + selectedItems!;
+                                  print(previousList.length);
+                                  totalAmount = 0.0;
 
-                                  for (var items in selectedItems!) {
-                                    totalAmount =
-                                        totalAmount! + items.salesRate!;
+                                  for (var items in previousList) {
+                                    totalAmount = totalAmount! +
+                                        (items.salesRate! *
+                                                int.tryParse(items.qty!)!)
+                                            .toDouble();
                                   }
 
-                                  setState(() {});
-                                  selectedItems!.clear();
+                                  displayList = previousList;
+                                  setState(() {
+                                    print("Data: $data");
+                                  });
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(24.0),

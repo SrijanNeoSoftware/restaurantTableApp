@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_menu_items_bloc/get_menu_items_bloc.dart';
+import 'package:restaurant_table_app/main.dart';
 import 'package:restaurant_table_app/models/get_items_list_model.dart';
 import 'package:restaurant_table_app/models/selected_items_list_model.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class PlaceOrderScreen extends StatefulWidget {
-  const PlaceOrderScreen({Key? key}) : super(key: key);
+  final dynamic tableName;
+  const PlaceOrderScreen({Key? key, this.tableName}) : super(key: key);
 
   @override
   State<PlaceOrderScreen> createState() => _PlaceOrderScreenState();
@@ -159,7 +161,15 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                             builder: (BuildContext context) =>
                                 AddOneItemDialogBuilder());
                       } else {
-                        Navigator.pop(context, selectedList);
+                        List<SelectedItemsListDatum> newList =
+                            box.get(widget.tableName);
+                        //add items for the current table
+                        newList = newList + selectedList!;
+
+                        // print("${newList[0].itemName}, ${newList[1].itemName}");
+
+                        box.put(widget.tableName, newList);
+                        Navigator.pop(context);
                       }
                     },
                     child: const Text("SUBMIT"),
