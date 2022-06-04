@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_menu_items_bloc/get_menu_items_bloc.dart';
+import 'package:restaurant_table_app/bloc/get_order_details_bloc/get_order_details_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
 import 'package:restaurant_table_app/repository/get_menu_items_repository.dart';
+import 'package:restaurant_table_app/repository/get_order_details_repository.dart';
 import 'package:restaurant_table_app/repository/get_tables_repository.dart';
 import 'package:restaurant_table_app/screens/home_screen/home_screen.dart';
 import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
@@ -11,7 +13,7 @@ import 'package:restaurant_table_app/screens/splash_screen/splash_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
-    final args = routeSettings.arguments;
+    final dynamic args = routeSettings.arguments;
     switch (routeSettings.name) {
       //Route for Splashscreen
       case "/":
@@ -33,8 +35,13 @@ class RouteGenerator {
       //Route for Splashscreen
       case "selectedItemsScreen":
         return MaterialPageRoute(
-          builder: (_) => SelectedItemsScreen(
-            tableDetails: args,
+          builder: (_) => BlocProvider(
+            create: (context) => GetOrderDetailsBloc(
+                getOrderDetailsRepository: GetOrderDetailsRepository())
+              ..add(FetchOrderDetailsEvent(tableCode: args!.tableCode)),
+            child: SelectedItemsScreen(
+              tableDetails: args,
+            ),
           ),
         );
 
