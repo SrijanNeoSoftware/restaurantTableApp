@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_menu_items_bloc/get_menu_items_bloc.dart';
-import 'package:restaurant_table_app/main.dart';
 import 'package:restaurant_table_app/models/get_items_list_model.dart';
+import 'package:restaurant_table_app/models/post_response_model.dart';
 import 'package:restaurant_table_app/models/selected_items_list_model.dart';
+import 'package:restaurant_table_app/repository/post_sales_order.dart';
+import 'package:restaurant_table_app/utils/dialog_utils.dart';
+import 'package:restaurant_table_app/utils/snackbar_utils.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class PlaceOrderScreen extends StatefulWidget {
@@ -18,16 +21,20 @@ class PlaceOrderScreen extends StatefulWidget {
 
 class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   GetMenuItemsBloc? getMenuItemsBloc;
+  PostSalesOrderRepository? _postSalesOrderRepository;
 
   @override
   void initState() {
     getMenuItemsBloc = BlocProvider.of<GetMenuItemsBloc>(context);
-
+    _postSalesOrderRepository = PostSalesOrderRepository();
     super.initState();
   }
 
   final TextEditingController _searchTextEditingController =
       TextEditingController();
+
+  final TextEditingController _paymentRemarksController =
+      TextEditingController(text: "");
   final List<SelectedItemsListDatum>? selectedList = [];
 
   @override
@@ -157,20 +164,125 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (selectedList!.isEmpty) {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) =>
                                 AddOneItemDialogBuilder());
                       } else {
-                        List<SelectedItemsListDatum> newList =
-                            box.get(widget.tableDetails.table) ?? [];
-                        //add items for the current table
-                        newList = newList + selectedList!;
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) => Dialog(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text("Remarks"),
+                                        UIHelper.verticalSpace(5),
+                                        TextField(
+                                          controller: _paymentRemarksController,
+                                          decoration: InputDecoration(
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 8, horizontal: 8),
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        UIHelper.verticalSpaceSmall(context),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                  onPressed: () async {
+                                                    Navigator.of(context,
+                                                            rootNavigator: true)
+                                                        .pop();
+                                                    try {
+                                                      DialogUtils
+                                                          .showLoadingDialog(
+                                                              context);
+                                                      PostResponseModel
+                                                          postResponse =
+                                                          await _postSalesOrderRepository!
+                                                              .postSalesOrderList(
+                                                        salesOrders:
+                                                            selectedList!,
+                                                        paymentRemarks:
+                                                            _paymentRemarksController
+                                                                .text,
+                                                      );
 
-                        box.put(widget.tableDetails.table, newList);
-                        Navigator.pop(context);
+                                                      //failed to post sales order
+                                                      if (postResponse
+                                                              .success ==
+                                                          0) {
+                                                        Navigator.of(context,
+                                                                rootNavigator:
+                                                                    true)
+                                                            .pop();
+                                                        SnackBarUtils
+                                                            .displaySnackBar(
+                                                                color:
+                                                                    Colors.red,
+                                                                context:
+                                                                    context,
+                                                                message:
+                                                                    "Could not place order");
+                                                      }
+                                                      //success while posting sales order
+                                                      else {
+                                                        Navigator.of(context,
+                                                                rootNavigator:
+                                                                    true)
+                                                            .pop();
+                                                        Navigator.of(context)
+                                                            .popUntil((route) =>
+                                                                route.isFirst);
+                                                        SnackBarUtils
+                                                            .displaySnackBar(
+                                                                color: Colors
+                                                                    .green,
+                                                                context:
+                                                                    context,
+                                                                message:
+                                                                    "Order placed");
+                                                      }
+                                                    } catch (e) {
+                                                      debugPrint(e.toString());
+                                                      SnackBarUtils.displaySnackBar(
+                                                          color: Colors.red,
+                                                          context: context,
+                                                          message:
+                                                              "Something went wrong");
+                                                    }
+                                                  },
+                                                  child: Text("Submit")),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ));
                       }
                     },
                     child: const Text("SUBMIT"),

@@ -9,8 +9,6 @@ import 'package:restaurant_table_app/screens/place_order_screen/place_order_scre
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class SelectedItemsScreen extends StatefulWidget {
-  // final SelectedItemsListDatum tableDetails;
-
   final dynamic tableDetails;
   const SelectedItemsScreen({Key? key, required this.tableDetails})
       : super(key: key);
@@ -85,34 +83,43 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                 children: [
                   //items list
                   Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: orderedItems.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(
-                              orderedItems[index].itemName,
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Rs. " +
-                                      orderedItems[index].amount.toString(),
-                                  style: Theme.of(context).textTheme.subtitle1,
-                                ),
-                                Text(
-                                  "Quantity: " +
-                                      orderedItems[index].quantity.toString(),
-                                  style: Theme.of(context).textTheme.subtitle1,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        getOrderDetailsBloc!.add(FetchOrderDetailsEvent(
+                            tableCode: widget.tableDetails!.tableCode));
                       },
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: orderedItems.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Card(
+                            child: ListTile(
+                              title: Text(
+                                orderedItems[index].itemName,
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                              subtitle: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Rs. " +
+                                        orderedItems[index].amount.toString(),
+                                    style:
+                                        Theme.of(context).textTheme.subtitle1,
+                                  ),
+                                  Text(
+                                    "Quantity: " +
+                                        orderedItems[index].quantity.toString(),
+                                    style:
+                                        Theme.of(context).textTheme.subtitle1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   UIHelper.verticalSpaceMedium(context),
