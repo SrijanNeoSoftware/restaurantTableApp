@@ -75,10 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       (BuildContext context, int index) {
                                     List<GetTableListDatum> table =
                                         state.tableList!.data!;
-                                    List<SelectedItemsListDatum>
-                                        tableOrderData =
-                                        box.get(table[index].tableName!) ?? [];
-
                                     return GestureDetector(
                                       onTap: () async {
                                         await Navigator.pushNamed(
@@ -114,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 color: Colors.white),
                                           ),
                                           UIHelper.verticalSpace(2),
-                                          tableOrderData.isEmpty
+                                          table[index].tableFull == 0
                                               ? Container()
                                               : Container(
                                                   padding:

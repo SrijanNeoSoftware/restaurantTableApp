@@ -40,19 +40,23 @@ class GetTableListDatum {
   GetTableListDatum({
     this.tableCode,
     this.tableName,
+    this.tableFull,
   });
 
   String? tableCode;
   String? tableName;
+  int? tableFull;
 
   factory GetTableListDatum.fromJson(Map<String, dynamic> json) =>
       GetTableListDatum(
         tableCode: json["TABLE_CODE"],
         tableName: json["TABLE_NAME"],
+        tableFull: json["TABLE_FULL"],
       );
 
   Map<String, dynamic> toJson() => {
         "TABLE_CODE": tableCode,
         "TABLE_NAME": tableName,
+        "TABLE_FULL": tableFull,
       };
 }
