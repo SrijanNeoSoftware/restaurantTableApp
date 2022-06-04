@@ -10,4 +10,4 @@ const getItemsUrl = "${baseUrl}ContactMaster/GetItems";
 
 const postSalesOrder = "${baseUrl}ContactMaster/GetSalesOrder";
 
-const getOrderDetails = "${baseUrl}ContactMaster/orderDetails";
+const getOrderDetailsUrl = "${baseUrl}ContactMaster/orderDetails";
