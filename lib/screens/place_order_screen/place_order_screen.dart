@@ -250,13 +250,9 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                                       }
                                                       //success while posting sales order
                                                       else {
-                                                        Navigator.of(context,
-                                                                rootNavigator:
-                                                                    true)
-                                                            .pop();
-                                                        Navigator.of(context)
-                                                            .popUntil((route) =>
-                                                                route.isFirst);
+                                                        print(
+                                                            "!!!!!!!!!!!!!!!!!!");
+
                                                         SnackBarUtils
                                                             .displaySnackBar(
                                                                 color: Colors
@@ -265,6 +261,9 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                                                     context,
                                                                 message:
                                                                     "Order placed");
+                                                        Navigator.of(context)
+                                                            .popUntil((route) =>
+                                                                route.isFirst);
                                                       }
                                                     } catch (e) {
                                                       debugPrint(e.toString());
