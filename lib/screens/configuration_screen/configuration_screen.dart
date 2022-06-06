@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_table_app/constants/ui_constants.dart';
+import 'package:restaurant_table_app/main.dart';
+import 'package:restaurant_table_app/utils/snackbar_utils.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class ConfigurationScreen extends StatefulWidget {
@@ -11,13 +13,30 @@ class ConfigurationScreen extends StatefulWidget {
 
 class _ConfigurationScreenState extends State<ConfigurationScreen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _baseUrlController = TextEditingController();
-  TextEditingController _portController = TextEditingController();
+  TextEditingController _baseUrlController =
+      TextEditingController(text: box.get("baseUrl") ?? "");
+  TextEditingController _portController =
+      TextEditingController(text: box.get("port") ?? "");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Configuration Screen"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _baseUrlController.clear();
+            _portController.clear();
+            box.clear();
+            SnackBarUtils.displaySnackBar(
+              context: context,
+              color: Colors.green,
+              message: "Configurations removed",
+            );
+          });
+        },
+        child: Icon(Icons.clear),
       ),
       body: Container(
         margin: screenMargin,
@@ -31,8 +50,18 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
               TextFormFieldBuilder(
                 controller: _baseUrlController,
               ),
+              UIHelper.verticalSpace(3),
+              Text(
+                "Hint: 100.01.012.101",
+                style: TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
+              ),
               UIHelper.verticalSpaceMedium(context),
               Text("Port"),
+              UIHelper.verticalSpace(3),
+              Text(
+                "Hint: 1234",
+                style: TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
+              ),
               UIHelper.verticalSpace(5),
               TextFormFieldBuilder(
                 controller: _portController,
@@ -43,8 +72,28 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        debugPrint("BASE URL " + _baseUrlController.text);
-                        debugPrint("PORT " + _portController.text);
+                        if (_formKey.currentState!.validate()) {
+                          debugPrint("BASE URL " + _baseUrlController.text);
+                          debugPrint("PORT " + _portController.text);
+
+                          try {
+                            box.put("baseUrl", _baseUrlController.text.trim());
+                            box.put("port", _portController.text.trim());
+                            SnackBarUtils.displaySnackBar(
+                              context: context,
+                              color: Colors.green,
+                              message: "Configurations set",
+                            );
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                          } catch (e) {
+                            SnackBarUtils.displaySnackBar(
+                              context: context,
+                              color: Colors.red,
+                              message: "Failed to set configurations",
+                            );
+                          }
+                        }
                       },
                       child: Text(
                         "SET CONFIGURATIONS",

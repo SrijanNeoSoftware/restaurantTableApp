@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_table_app/main.dart';
 import 'package:restaurant_table_app/screens/configuration_screen/configuration_screen.dart';
+import 'package:restaurant_table_app/utils/snackbar_utils.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -109,22 +111,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: ElevatedButton.styleFrom(
                                 primary: Theme.of(context).primaryColor),
                             onPressed: () {
+                              String baseUrl = box.get("baseUrl") ?? "";
+                              String port = box.get("port") ?? "";
                               if (_formKey.currentState!.validate()) {
-                                if (_usernameEditingController.text ==
+                                if (baseUrl.isEmpty || port.isEmpty) {
+                                  SnackBarUtils.displaySnackBar(
+                                      context: context,
+                                      color: Colors.red,
+                                      message: "No configurations found!");
+                                } else if (_usernameEditingController.text
+                                            .trim() ==
                                         "admin" &&
-                                    _passwordEditingController.text ==
+                                    _passwordEditingController.text.trim() ==
                                         "admin") {
                                   Navigator.pushReplacementNamed(
                                       context, 'homeScreen');
                                 } else {
-                                  ScaffoldMessenger.of(context)
-                                      .clearSnackBars();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        backgroundColor: Colors.red,
-                                        content: Text(
-                                            "Invalid username or password")),
-                                  );
+                                  SnackBarUtils.displaySnackBar(
+                                      context: context,
+                                      color: Colors.red,
+                                      message: "Invalid username or password!");
                                 }
                               }
                             },

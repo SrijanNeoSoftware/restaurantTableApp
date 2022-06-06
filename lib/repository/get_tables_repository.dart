@@ -8,8 +8,10 @@ import 'package:restaurant_table_app/utils/network_utils.dart';
 class GetTablesListRepository extends BaseRepository {
   getTablesList() async {
     try {
+      String baseUrl = getBaseUrlWithPort();
+
       Response<dynamic> response = await dioGetRequest(
-        url: getTablesUrl,
+        url: baseUrl + getTablesUrl,
       );
 
       GetTableListModel getTableList =

@@ -30,7 +30,7 @@ class NetworkUtils {
           break;
 
         case DioErrorType.cancel:
-          errorDescription = "Request to the server was cancled.";
+          errorDescription = "Request to the server was cancelled.";
           break;
 
         case DioErrorType.response:

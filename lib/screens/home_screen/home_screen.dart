@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
-import 'package:restaurant_table_app/main.dart';
 import 'package:restaurant_table_app/models/get_tables_list_model.dart';
 import 'package:restaurant_table_app/models/selected_items_list_model.dart';
+import 'package:restaurant_table_app/screens/configuration_screen/configuration_screen.dart';
 import 'package:restaurant_table_app/screens/login_screen/login_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
@@ -169,7 +169,6 @@ class _HomeScreenState extends State<HomeScreen> {
               right: 0,
               child: IconButton(
                 onPressed: () {
-                  box.clear();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -178,6 +177,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 icon: const Icon(Icons.exit_to_app, color: Colors.white),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              right: 50,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ConfigurationScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.settings, color: Colors.white),
               ),
             ),
           ],

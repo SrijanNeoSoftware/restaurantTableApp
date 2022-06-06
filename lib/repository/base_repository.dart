@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:restaurant_table_app/main.dart';
 import '../utils/network_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,14 @@ class BaseRepository {
         'Accept': 'application/json',
       },
     );
+  }
+
+  String getBaseUrlWithPort() {
+    String baseUrl = "";
+
+    baseUrl = "http://" + box.get("baseUrl") + ":" + box.get("port");
+
+    return baseUrl;
   }
 
   ///BASE GET REQUEST

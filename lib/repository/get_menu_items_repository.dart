@@ -8,8 +8,10 @@ import 'package:restaurant_table_app/utils/network_utils.dart';
 class GetMenuItemsRepository extends BaseRepository {
   getMenuItem({@required String? searchItemName}) async {
     try {
+      String baseUrl = getBaseUrlWithPort();
+
       Response<dynamic> response = await dioGetRequest(
-        url: getItemsUrl,
+        url: baseUrl + getItemsUrl,
       );
 
       GetItemsListModel getItemList = GetItemsListModel.fromJson(response.data);

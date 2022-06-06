@@ -14,6 +14,8 @@ class PostSalesOrderRepository extends BaseRepository {
       required String paymentRemarks}) async {
     List items = [];
     try {
+      String baseUrl = getBaseUrlWithPort();
+
       for (SelectedItemsListDatum item in salesOrders) {
         items.add(
           {
@@ -36,7 +38,7 @@ class PostSalesOrderRepository extends BaseRepository {
       debugPrint("POST SALES ORDER REQUEST BODY " + jsonEncode(requestBody));
 
       Response<dynamic> response = await dioPostRequest(
-        url: postSalesOrder,
+        url: baseUrl + postSalesOrder,
         requestBody: requestBody,
       );
       debugPrint("POST SALES ORDER RESPONSE " + response.data.toString());

@@ -10,8 +10,11 @@ import 'package:restaurant_table_app/utils/network_utils.dart';
 class GetOrderDetailsRepository extends BaseRepository {
   getOrderItems({required String tableCode}) async {
     try {
+      String baseUrl = getBaseUrlWithPort();
+
       Response<dynamic> response = await dioGetRequest(
-          url: getOrderDetailsUrl, queryParameters: {"TableCode": tableCode});
+          url: baseUrl + getOrderDetailsUrl,
+          queryParameters: {"TableCode": tableCode});
 
       debugPrint("GET ORDER ITEMS RESPONSE " + jsonEncode(response.data));
 
