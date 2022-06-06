@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:restaurant_table_app/constants/api_constants.dart';
 import 'package:restaurant_table_app/models/post_response_model.dart';
@@ -31,7 +33,7 @@ class PostSalesOrderRepository extends BaseRepository {
         "SalesOrderRemarks": paymentRemarks
       };
 
-      debugPrint("POST SALES ORDER REQUEST BODY " + requestBody.toString());
+      debugPrint("POST SALES ORDER REQUEST BODY " + jsonEncode(requestBody));
 
       Response<dynamic> response = await dioPostRequest(
         url: postSalesOrder,

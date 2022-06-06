@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_table_app/screens/configuration_screen/configuration_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,6 +18,18 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        tooltip: "Set Application Configurations",
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ConfigurationScreen(),
+            ),
+          );
+        },
+        child: const Icon(Icons.settings, color: Colors.white),
+      ),
       body: Container(
         decoration: const BoxDecoration(
             image: DecorationImage(

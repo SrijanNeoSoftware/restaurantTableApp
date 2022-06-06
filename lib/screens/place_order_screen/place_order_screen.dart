@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_menu_items_bloc/get_menu_items_bloc.dart';
+import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
 import 'package:restaurant_table_app/models/get_items_list_model.dart';
 import 'package:restaurant_table_app/models/post_response_model.dart';
 import 'package:restaurant_table_app/models/selected_items_list_model.dart';
@@ -23,18 +24,19 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   GetMenuItemsBloc? getMenuItemsBloc;
   PostSalesOrderRepository? _postSalesOrderRepository;
 
+  GetTableListBloc? getTableListBloc;
+
   @override
   void initState() {
     getMenuItemsBloc = BlocProvider.of<GetMenuItemsBloc>(context);
+    getTableListBloc = BlocProvider.of<GetTableListBloc>(context);
+
     _postSalesOrderRepository = PostSalesOrderRepository();
     super.initState();
   }
 
   final TextEditingController _searchTextEditingController =
       TextEditingController();
-
-  final TextEditingController _paymentRemarksController =
-      TextEditingController(text: "");
   final List<SelectedItemsListDatum>? selectedList = [];
 
   @override
@@ -171,117 +173,41 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                             builder: (BuildContext context) =>
                                 AddOneItemDialogBuilder());
                       } else {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) => Dialog(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text("Remarks"),
-                                        UIHelper.verticalSpace(5),
-                                        TextField(
-                                          controller: _paymentRemarksController,
-                                          decoration: InputDecoration(
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 8, horizontal: 8),
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Theme.of(context)
-                                                    .primaryColor,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Theme.of(context)
-                                                    .primaryColor,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Theme.of(context)
-                                                    .primaryColor,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        UIHelper.verticalSpaceSmall(context),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: ElevatedButton(
-                                                  onPressed: () async {
-                                                    Navigator.of(context,
-                                                            rootNavigator: true)
-                                                        .pop();
-                                                    try {
-                                                      DialogUtils
-                                                          .showLoadingDialog(
-                                                              context);
-                                                      PostResponseModel
-                                                          postResponse =
-                                                          await _postSalesOrderRepository!
-                                                              .postSalesOrderList(
-                                                        salesOrders:
-                                                            selectedList!,
-                                                        paymentRemarks:
-                                                            _paymentRemarksController
-                                                                .text,
-                                                      );
+                        try {
+                          DialogUtils.showLoadingDialog(context);
+                          PostResponseModel postResponse =
+                              await _postSalesOrderRepository!
+                                  .postSalesOrderList(
+                            salesOrders: selectedList!,
+                            paymentRemarks: "Payment Remarks",
+                          );
 
-                                                      //failed to post sales order
-                                                      if (postResponse
-                                                              .success ==
-                                                          0) {
-                                                        Navigator.of(context,
-                                                                rootNavigator:
-                                                                    true)
-                                                            .pop();
-                                                        SnackBarUtils
-                                                            .displaySnackBar(
-                                                                color:
-                                                                    Colors.red,
-                                                                context:
-                                                                    context,
-                                                                message:
-                                                                    "Could not place order");
-                                                      }
-                                                      //success while posting sales order
-                                                      else {
-                                                        print(
-                                                            "!!!!!!!!!!!!!!!!!!");
+                          //failed to post sales order
+                          if (postResponse.success == 0) {
+                            Navigator.of(context, rootNavigator: true).pop();
+                            SnackBarUtils.displaySnackBar(
+                                color: Colors.red,
+                                context: context,
+                                message: "Could not place order");
+                          }
+                          //success while posting sales order
+                          else {
+                            SnackBarUtils.displaySnackBar(
+                                color: Colors.green,
+                                context: context,
+                                message: "Order placed");
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
 
-                                                        SnackBarUtils
-                                                            .displaySnackBar(
-                                                                color: Colors
-                                                                    .green,
-                                                                context:
-                                                                    context,
-                                                                message:
-                                                                    "Order placed");
-                                                        Navigator.of(context)
-                                                            .popUntil((route) =>
-                                                                route.isFirst);
-                                                      }
-                                                    } catch (e) {
-                                                      debugPrint(e.toString());
-                                                      SnackBarUtils.displaySnackBar(
-                                                          color: Colors.red,
-                                                          context: context,
-                                                          message:
-                                                              "Something went wrong");
-                                                    }
-                                                  },
-                                                  child: Text("Submit")),
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ));
+                            getTableListBloc!.add(FetchTableListEvent());
+                          }
+                        } catch (e) {
+                          debugPrint(e.toString());
+                          SnackBarUtils.displaySnackBar(
+                              color: Colors.red,
+                              context: context,
+                              message: "Something went wrong");
+                        }
                       }
                     },
                     child: const Text("SUBMIT"),

@@ -15,12 +15,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  GetTableListBloc? getTableListBloc;
+  @override
+  void initState() {
+    getTableListBloc = BlocProvider.of<GetTableListBloc>(context);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    GetTableListBloc getTableListBloc;
-    getTableListBloc = BlocProvider.of<GetTableListBloc>(context);
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              getTableListBloc!.add(FetchTableListEvent());
+            },
+            child: const Icon(Icons.refresh)),
         body: Stack(
           children: [
             Container(

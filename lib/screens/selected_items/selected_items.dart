@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_menu_items_bloc/get_menu_items_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_order_details_bloc/get_order_details_bloc.dart';
+import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
 import 'package:restaurant_table_app/constants/ui_constants.dart';
 import 'package:restaurant_table_app/models/get_order_details_model.dart';
 import 'package:restaurant_table_app/repository/get_menu_items_repository.dart';
+import 'package:restaurant_table_app/repository/get_tables_repository.dart';
 import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
@@ -36,15 +38,28 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
           var data = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => GetMenuItemsBloc(
-                    getMenuItemsRepository: GetMenuItemsRepository())
-                  ..add(FetchMenuItems(searchItemName: "")),
-                child: PlaceOrderScreen(
-                  tableDetails: widget.tableDetails,
-                ),
-              ),
-            ),
+                builder: (context) => MultiBlocProvider(
+                      providers: [
+                        BlocProvider(
+                          create: (context) => GetMenuItemsBloc(
+                              getMenuItemsRepository: GetMenuItemsRepository())
+                            ..add(
+                              FetchMenuItems(searchItemName: ""),
+                            ),
+                        ),
+                        BlocProvider(
+                          create: (context) => GetTableListBloc(
+                              getTablesListRepository:
+                                  GetTablesListRepository())
+                            ..add(
+                              FetchTableListEvent(),
+                            ),
+                        ),
+                      ],
+                      child: PlaceOrderScreen(
+                        tableDetails: widget.tableDetails,
+                      ),
+                    )),
           );
         },
         child: Image.asset(

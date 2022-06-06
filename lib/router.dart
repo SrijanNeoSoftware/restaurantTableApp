@@ -48,13 +48,25 @@ class RouteGenerator {
       //Route for Splashscreen
       case "placeOrderScreen":
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => GetMenuItemsBloc(
-                getMenuItemsRepository: GetMenuItemsRepository())
-              ..add(FetchMenuItems(searchItemName: "")),
-            child: const PlaceOrderScreen(),
-          ),
-        );
+            builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => GetMenuItemsBloc(
+                          getMenuItemsRepository: GetMenuItemsRepository())
+                        ..add(
+                          FetchMenuItems(searchItemName: ""),
+                        ),
+                    ),
+                    BlocProvider(
+                      create: (context) => GetTableListBloc(
+                          getTablesListRepository: GetTablesListRepository())
+                        ..add(
+                          FetchTableListEvent(),
+                        ),
+                    ),
+                  ],
+                  child: const PlaceOrderScreen(),
+                ));
 
       default:
         return _errorRoute();
