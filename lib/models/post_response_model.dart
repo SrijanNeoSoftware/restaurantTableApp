@@ -14,19 +14,22 @@ class PostResponseModel {
   PostResponseModel({
     required this.success,
     this.message,
+    this.data,
   });
 
   int success;
   dynamic message;
+  dynamic data;
 
   factory PostResponseModel.fromJson(Map<String, dynamic> json) =>
       PostResponseModel(
-        success: json["success"],
-        message: json["message"],
-      );
+          success: json["success"],
+          message: json["message"],
+          data: json["Data"]);
 
   Map<String, dynamic> toJson() => {
         "success": success,
         "message": message,
+        "Data": data,
       };
 }

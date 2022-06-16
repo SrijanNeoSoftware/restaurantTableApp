@@ -41,22 +41,29 @@ class GetOrderDetailsDatum {
     required this.itemName,
     required this.quantity,
     required this.amount,
+    required this.transactionNo,
+    required this.serialNo,
   });
 
   String itemName;
   int quantity;
   int amount;
+  String transactionNo;
+  int serialNo;
 
   factory GetOrderDetailsDatum.fromJson(Map<String, dynamic> json) =>
       GetOrderDetailsDatum(
-        itemName: json["ITEM_NAME"],
-        quantity: json["QUANTITY"],
-        amount: json["AMOUNT"],
-      );
+          itemName: json["ITEM_NAME"],
+          quantity: json["QUANTITY"],
+          amount: json["AMOUNT"],
+          transactionNo: json["TRANSACTION_NO"],
+          serialNo: json["SERIAL_NO"]);
 
   Map<String, dynamic> toJson() => {
         "ITEM_NAME": itemName,
         "QUANTITY": quantity,
         "AMOUNT": amount,
+        "TRANSACTION_NO": transactionNo,
+        "SERIAL_NO": serialNo,
       };
 }

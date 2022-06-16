@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_table_app/bloc/get_order_details_bloc/get_order_details_bloc.dart';
 import 'package:restaurant_table_app/constants/ui_constants.dart';
 import 'package:restaurant_table_app/models/get_order_details_model.dart';
+import 'package:restaurant_table_app/models/post_response_model.dart';
+import 'package:restaurant_table_app/repository/post_edit_order_repository.dart';
+import 'package:restaurant_table_app/utils/dialog_utils.dart';
+import 'package:restaurant_table_app/utils/snackbar_utils.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class EditOrderDialogBuilder extends StatefulWidget {
   final GetOrderDetailsDatum orderItem;
+  final GetOrderDetailsBloc getOrderDetailsBloc;
+  final dynamic tableCode;
 
-  const EditOrderDialogBuilder({Key? key, required this.orderItem})
+  const EditOrderDialogBuilder(
+      {Key? key,
+      required this.orderItem,
+      required this.getOrderDetailsBloc,
+      required this.tableCode})
       : super(key: key);
 
   @override
@@ -15,24 +26,26 @@ class EditOrderDialogBuilder extends StatefulWidget {
 
 class _EditOrderDialogBuilderState extends State<EditOrderDialogBuilder> {
   TextEditingController quantityController = TextEditingController();
-  TextEditingController amountController = TextEditingController();
   double? salesRate;
   double? totalAmount;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  PostUpdateOrderRepository _postUpdateOrderRepository =
+      PostUpdateOrderRepository();
 
   @override
   void initState() {
-    salesRate = widget.orderItem.amount / widget.orderItem.quantity;
+    salesRate = double.tryParse(
+        (widget.orderItem.amount / widget.orderItem.quantity)
+            .toStringAsExponential(2));
     quantityController.text = widget.orderItem.quantity.toString();
-    totalAmount = widget.orderItem.quantity * salesRate!;
-    amountController.text = totalAmount!.toString();
+    totalAmount = double.tryParse(
+        (widget.orderItem.quantity * salesRate!).toStringAsExponential(2));
     super.initState();
   }
 
   @override
   void dispose() {
     quantityController.dispose();
-    amountController.dispose();
     super.dispose();
   }
 
@@ -44,6 +57,7 @@ class _EditOrderDialogBuilderState extends State<EditOrderDialogBuilder> {
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
@@ -68,12 +82,13 @@ class _EditOrderDialogBuilderState extends State<EditOrderDialogBuilder> {
                 onChanged: (String value) {
                   if (value.isEmpty) {
                     setState(() {
-                      amountController.clear();
+                      totalAmount = 0.0;
                     });
                   } else {
                     setState(() {
-                      amountController.text =
-                          (int.tryParse(value)! * salesRate!).toString();
+                      totalAmount = double.tryParse(
+                          (int.tryParse(value)! * salesRate!)
+                              .toStringAsExponential(2));
                     });
                   }
                 },
@@ -84,26 +99,53 @@ class _EditOrderDialogBuilderState extends State<EditOrderDialogBuilder> {
                 },
               ),
               UIHelper.verticalSpaceSmall(context),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: amountController,
-                decoration: inputBorderDecoration(
-                    context: context, label: "Amount (Rs.)"),
-                validator: (String? value) {
-                  if (value!.isEmpty) {
-                    return "*";
-                  }
-                },
+              Text(
+                "Rs. " + totalAmount.toString(),
+                style: Theme.of(context).textTheme.headline4,
               ),
               UIHelper.verticalSpaceSmall(context),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          debugPrint(quantityController.text);
-                          debugPrint(amountController.text);
+                          debugPrint(widget.orderItem.itemName);
+                          debugPrint(int.tryParse(quantityController.text)!
+                              .toString());
+                          debugPrint(totalAmount.toString());
+                          debugPrint(widget.orderItem.transactionNo);
+                          debugPrint(widget.orderItem.serialNo.toString());
+                          //pop edit dialog
+                          Navigator.of(context, rootNavigator: true).pop();
+                          DialogUtils.showLoadingDialog(context);
+                          PostResponseModel response =
+                              await _postUpdateOrderRepository.postUpdateOrder(
+                            itemName: widget.orderItem.itemName,
+                            quantity: int.tryParse(quantityController.text)!,
+                            amount: totalAmount!,
+                            transactionNo: widget.orderItem.transactionNo,
+                            serialNo: widget.orderItem.serialNo,
+                          );
+
+                          if (response.success != 1) {
+                            //pop loading dialog
+                            Navigator.of(context, rootNavigator: true).pop();
+                            SnackBarUtils.displaySnackBar(
+                                color: Colors.red,
+                                context: context,
+                                message: "Order could not be updated!");
+                          } else {
+                            //pop loading dialog
+                            Navigator.of(context, rootNavigator: true).pop();
+                            widget.getOrderDetailsBloc.add(
+                                FetchOrderDetailsEvent(
+                                    tableCode: widget.tableCode));
+                            SnackBarUtils.displaySnackBar(
+                                color: Colors.green,
+                                context: context,
+                                message: "Order updated successfully!");
+                          }
                         }
                       },
                       child: Text(
