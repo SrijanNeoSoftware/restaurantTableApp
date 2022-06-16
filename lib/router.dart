@@ -6,6 +6,7 @@ import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_blo
 import 'package:restaurant_table_app/repository/get_menu_items_repository.dart';
 import 'package:restaurant_table_app/repository/get_order_details_repository.dart';
 import 'package:restaurant_table_app/repository/get_tables_repository.dart';
+import 'package:restaurant_table_app/screens/edit_order_screen/edit_order_screen.dart';
 import 'package:restaurant_table_app/screens/home_screen/home_screen.dart';
 import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
 import 'package:restaurant_table_app/screens/selected_items/selected_items.dart';

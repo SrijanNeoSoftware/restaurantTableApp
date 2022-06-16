@@ -7,6 +7,7 @@ import 'package:restaurant_table_app/constants/ui_constants.dart';
 import 'package:restaurant_table_app/models/get_order_details_model.dart';
 import 'package:restaurant_table_app/repository/get_menu_items_repository.dart';
 import 'package:restaurant_table_app/repository/get_tables_repository.dart';
+import 'package:restaurant_table_app/screens/edit_order_screen/edit_order_screen.dart';
 import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
@@ -109,6 +110,15 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                         itemBuilder: (BuildContext context, int index) {
                           return Card(
                             child: ListTile(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      EditOrderDialogBuilder(
+                                    orderItem: orderedItems[index],
+                                  ),
+                                );
+                              },
                               title: Text(
                                 orderedItems[index].itemName,
                                 style: Theme.of(context).textTheme.headline6,

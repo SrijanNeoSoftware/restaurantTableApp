@@ -4,3 +4,4 @@ const getTablesUrl = "/api/ContactMaster/GetTables";
 const getItemsUrl = "/api/ContactMaster/GetItems";
 const postSalesOrder = "/api/ContactMaster/GetSalesOrder";
 const getOrderDetailsUrl = "/api/ContactMaster/orderDetails";
+const postUpdateItemsUrl = "/api/ContactMaster/updateitems";
