@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
+import 'package:restaurant_table_app/models/get_login_model.dart';
 import 'package:restaurant_table_app/models/get_tables_list_model.dart';
 import 'package:restaurant_table_app/models/selected_items_list_model.dart';
 import 'package:restaurant_table_app/screens/configuration_screen/configuration_screen.dart';
@@ -8,7 +9,8 @@ import 'package:restaurant_table_app/screens/login_screen/login_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final LoginData loginData;
+  const HomeScreen({Key? key, required this.loginData}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -158,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 top: 10,
                 left: 10,
                 child: Text(
-                  "Admin",
+                  widget.loginData.userName,
                   style: Theme.of(context)
                       .textTheme
                       .headline6!

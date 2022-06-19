@@ -28,7 +28,7 @@ class RouteGenerator {
             create: (context) => GetTableListBloc(
                 getTablesListRepository: GetTablesListRepository())
               ..add(FetchTableListEvent()),
-            child: const HomeScreen(),
+            child: HomeScreen(loginData: args),
           ),
         );
 

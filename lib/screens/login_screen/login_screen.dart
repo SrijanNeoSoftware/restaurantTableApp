@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_table_app/main.dart';
+import 'package:restaurant_table_app/models/get_login_model.dart';
+import 'package:restaurant_table_app/repository/get_login_repository.dart';
 import 'package:restaurant_table_app/screens/configuration_screen/configuration_screen.dart';
+import 'package:restaurant_table_app/utils/dialog_utils.dart';
 import 'package:restaurant_table_app/utils/snackbar_utils.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
 
@@ -17,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
       TextEditingController();
   final TextEditingController _passwordEditingController =
       TextEditingController();
+  GetLoginRepository getLoginRepository = GetLoginRepository();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 primary: Theme.of(context).primaryColor),
-                            onPressed: () {
+                            onPressed: () async {
                               String baseUrl = box.get("baseUrl") ?? "";
                               String port = box.get("port") ?? "";
                               if (_formKey.currentState!.validate()) {
@@ -119,19 +123,50 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context: context,
                                       color: Colors.red,
                                       message: "No configurations found!");
-                                } else if (_usernameEditingController.text
-                                            .trim() ==
-                                        "admin" &&
-                                    _passwordEditingController.text.trim() ==
-                                        "admin") {
-                                  Navigator.pushReplacementNamed(
-                                      context, 'homeScreen');
                                 } else {
-                                  SnackBarUtils.displaySnackBar(
-                                      context: context,
-                                      color: Colors.red,
-                                      message: "Invalid username or password!");
+                                  try {
+                                    DialogUtils.showLoadingDialog(context);
+                                    LoginModel loginResult =
+                                        await getLoginRepository.getLogin(
+                                      username: _usernameEditingController.text
+                                          .trim(),
+                                      password: _passwordEditingController.text
+                                          .trim(),
+                                    );
+
+                                    if (loginResult.success != 1) {
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
+                                      SnackBarUtils.displaySnackBar(
+                                          context: context,
+                                          color: Colors.red,
+                                          message: loginResult.message);
+                                    } else {
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
+                                      Navigator.pushReplacementNamed(
+                                          context, 'homeScreen',
+                                          arguments: loginResult.data);
+                                      SnackBarUtils.displaySnackBar(
+                                          context: context,
+                                          color: Colors.green,
+                                          message: loginResult.message);
+                                    }
+                                  } catch (e) {
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+                                    SnackBarUtils.displaySnackBar(
+                                        context: context,
+                                        color: Colors.red,
+                                        message: "Login unsuccessful");
+                                  }
                                 }
+                                // else {
+                                // SnackBarUtils.displaySnackBar(
+                                //     context: context,
+                                //     color: Colors.red,
+                                //     message: "Invalid username or password!");
+                                // }
                               }
                             },
                             child: const Text("LOGIN"),
