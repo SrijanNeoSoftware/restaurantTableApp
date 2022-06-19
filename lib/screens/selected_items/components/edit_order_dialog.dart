@@ -26,7 +26,7 @@ class EditOrderDialogBuilder extends StatefulWidget {
 
 class _EditOrderDialogBuilderState extends State<EditOrderDialogBuilder> {
   TextEditingController quantityController = TextEditingController();
-  double? salesRate;
+  int? salesRate;
   double? totalAmount;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   PostUpdateOrderRepository _postUpdateOrderRepository =
@@ -34,9 +34,7 @@ class _EditOrderDialogBuilderState extends State<EditOrderDialogBuilder> {
 
   @override
   void initState() {
-    salesRate = double.tryParse(
-        (widget.orderItem.amount / widget.orderItem.quantity)
-            .toStringAsExponential(2));
+    salesRate = widget.orderItem.rate;
     quantityController.text = widget.orderItem.quantity.toString();
     totalAmount = double.tryParse(
         (widget.orderItem.quantity * salesRate!).toStringAsExponential(2));

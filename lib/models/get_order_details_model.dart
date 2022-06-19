@@ -51,7 +51,7 @@ class GetOrderDetailsDatum {
   int amount;
   String transactionNo;
   int serialNo;
-  double rate;
+  int rate;
 
   factory GetOrderDetailsDatum.fromJson(Map<String, dynamic> json) =>
       GetOrderDetailsDatum(
