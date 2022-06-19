@@ -5,11 +5,15 @@ import 'package:restaurant_table_app/bloc/get_order_details_bloc/get_order_detai
 import 'package:restaurant_table_app/bloc/get_table_list_bloc/get_table_list_bloc.dart';
 import 'package:restaurant_table_app/constants/ui_constants.dart';
 import 'package:restaurant_table_app/models/get_order_details_model.dart';
+import 'package:restaurant_table_app/models/post_response_model.dart';
 import 'package:restaurant_table_app/repository/get_menu_items_repository.dart';
 import 'package:restaurant_table_app/repository/get_tables_repository.dart';
+import 'package:restaurant_table_app/repository/post_delete_items.dart';
+import 'package:restaurant_table_app/screens/selected_items/components/delete_Item.dart';
 import 'package:restaurant_table_app/screens/selected_items/components/edit_order_dialog.dart';
 import 'package:restaurant_table_app/screens/place_order_screen/place_order_screen.dart';
 import 'package:restaurant_table_app/utils/ui_helper.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class SelectedItemsScreen extends StatefulWidget {
   final dynamic tableDetails;
@@ -107,41 +111,122 @@ class _SelectedItemsScreenState extends State<SelectedItemsScreen> {
                       child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: orderedItems.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            child: ListTile(
-                              onTap: () {
-                                showDialog(
+                        itemBuilder: (BuildContext listViewContext, int index) {
+                          return Slidable(
+                            startActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              dismissible: DismissiblePane(onDismissed: () {
+                                deleteItem(
                                   context: context,
-                                  builder: (BuildContext context) =>
-                                      EditOrderDialogBuilder(
-                                    orderItem: orderedItems[index],
-                                    getOrderDetailsBloc: getOrderDetailsBloc!,
-                                    tableCode: widget.tableDetails!.tableCode,
-                                  ),
+                                  orderItem: orderedItems[index],
                                 );
-                              },
-                              title: Text(
-                                orderedItems[index].itemName,
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
-                              subtitle: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Rs. " +
-                                        orderedItems[index].amount.toString(),
-                                    style:
-                                        Theme.of(context).textTheme.subtitle1,
+
+                                getOrderDetailsBloc!.add(FetchOrderDetailsEvent(
+                                    tableCode: widget.tableDetails!.tableCode));
+                              }),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (BuildContext slideContext) {
+                                    deleteItem(
+                                      context: context,
+                                      orderItem: orderedItems[index],
+                                    );
+                                    getOrderDetailsBloc!.add(
+                                        FetchOrderDetailsEvent(
+                                            tableCode: widget
+                                                .tableDetails!.tableCode));
+                                  },
+                                  backgroundColor: Color(0xFFFE4A49),
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.delete,
+                                  label: 'Delete',
+                                ),
+                              ],
+                            ),
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              dismissible: DismissiblePane(onDismissed: () {
+                                deleteItem(
+                                  context: context,
+                                  orderItem: orderedItems[index],
+                                );
+
+                                getOrderDetailsBloc!.add(FetchOrderDetailsEvent(
+                                    tableCode: widget.tableDetails!.tableCode));
+                              }),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (BuildContext context) {
+                                    deleteItem(
+                                      context: context,
+                                      orderItem: orderedItems[index],
+                                    );
+                                    getOrderDetailsBloc!.add(
+                                        FetchOrderDetailsEvent(
+                                            tableCode: widget
+                                                .tableDetails!.tableCode));
+                                  },
+                                  backgroundColor: Color(0xFFFE4A49),
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.delete,
+                                  label: 'Delete',
+                                ),
+                              ],
+                            ),
+                            key: ValueKey(index),
+                            child: Card(
+                              child: ListTile(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        EditOrderDialogBuilder(
+                                      orderItem: orderedItems[index],
+                                      getOrderDetailsBloc: getOrderDetailsBloc!,
+                                      tableCode: widget.tableDetails!.tableCode,
+                                    ),
+                                  );
+                                },
+                                title: Text(
+                                  orderedItems[index].itemName,
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                                subtitle: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Rs. " +
+                                          orderedItems[index].amount.toString(),
+                                      style:
+                                          Theme.of(context).textTheme.subtitle1,
+                                    ),
+                                    Text(
+                                      "Quantity: " +
+                                          orderedItems[index]
+                                              .quantity
+                                              .toString(),
+                                      style:
+                                          Theme.of(context).textTheme.subtitle1,
+                                    ),
+                                  ],
+                                ),
+                                trailing: IconButton(
+                                  onPressed: () {
+                                    deleteItem(
+                                      context: context,
+                                      orderItem: orderedItems[index],
+                                    );
+                                    getOrderDetailsBloc!.add(
+                                        FetchOrderDetailsEvent(
+                                            tableCode: widget
+                                                .tableDetails!.tableCode));
+                                  },
+                                  icon: Icon(
+                                    Icons.delete_forever,
+                                    color: Color(0xFFFE4A49),
                                   ),
-                                  Text(
-                                    "Quantity: " +
-                                        orderedItems[index].quantity.toString(),
-                                    style:
-                                        Theme.of(context).textTheme.subtitle1,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           );
